@@ -10,7 +10,7 @@ Summary:
 
 In this project users can create Tasks that they want to complete within 24hours(A single Day) 
 
-Features
+Features:
 
 Authentication
 Dash Board for Management
