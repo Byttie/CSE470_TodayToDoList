@@ -23,3 +23,13 @@ Buying Rewards For Task Completion Using Points
 Sharing Progress with Others and Creating Posts
 Comment on Other Peoples Progress and Posts
 Rate Their Progress
+
+
+Direcotry Structure 
+
+
+
+
+
+
+
