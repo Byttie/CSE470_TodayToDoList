@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './homepage.css';
 
 const Homepage = () => {
@@ -32,7 +33,7 @@ const Homepage = () => {
         <div className="login-card">
           <div className="login-header">
             <h1>TodayToDoList</h1>
-            <p>Your personal task management solution</p>
+            <p>Login to your account</p>
           </div>
           
           <form onSubmit={handleLogin} className="login-form">
@@ -68,7 +69,7 @@ const Homepage = () => {
           </form>
           
           <div className="login-footer">
-            <p>Don't have an account? <a href="#" className="signup-link">Sign up</a></p>
+            <p>Don't have an account? <Link to="/signup" className="signup-link">Sign up</Link></p>
           </div>
         </div>
       </div>
