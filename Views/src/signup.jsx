@@ -6,8 +6,9 @@ const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     
     // Simple validation
@@ -21,10 +22,32 @@ const Signup = () => {
       return;
     }
     
-    // For now, just show success message
+    setIsLoading(true);
     setError('');
-    setPassword(''); // Clear password for security
-    alert('Signup successful! (Database implementation coming soon)');
+    
+    try {
+      const response = await fetch('http://localhost:3000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setPassword(''); // Clear password for security
+        alert('Signup successful! Your account has been created.');
+        setUsername(''); // Clear username as well
+      } else {
+        setError(data.error || 'Signup failed. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,6 +69,7 @@ const Signup = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -58,13 +82,14 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                disabled={isLoading}
               />
             </div>
             
             {error && <div className="error-message">{error}</div>}
             
-            <button type="submit" className="login-btn">
-              Sign Up
+            <button type="submit" className="login-btn" disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Sign Up'}
             </button>
           </form>
           

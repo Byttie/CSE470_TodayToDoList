@@ -6,8 +6,9 @@ const Homepage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     
     // Simple validation - in a real app, this would connect to a backend
@@ -21,10 +22,32 @@ const Homepage = () => {
       return;
     }
     
-    // For now, just show success message
+    setIsLoading(true);
     setError('');
-    setPassword(''); // Clear password for security
-    alert('Login successful! (Dashboard functionality coming soon)');
+    
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setPassword(''); // Clear password for security
+        alert('Login successful! Welcome back!');
+        setUsername(''); // Clear username as well
+      } else {
+        setError(data.error || 'Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,6 +69,7 @@ const Homepage = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -58,13 +82,14 @@ const Homepage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                disabled={isLoading}
               />
             </div>
             
             {error && <div className="error-message">{error}</div>}
             
-            <button type="submit" className="login-btn">
-              Login
+            <button type="submit" className="login-btn" disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
           
