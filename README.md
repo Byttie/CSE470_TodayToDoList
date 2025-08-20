@@ -30,6 +30,11 @@ Instructions
 1. Install nodejs
 2. Install npm 
 3. Install POSTGRE SQL
+4. Open two terminals
+5. Go to "/CSE470_TodayToDoList/Views" Directory
+6. run npm run dev in terminal 1
+7. Go to "/CSE470_TodayToDoList/Controller"
+8. run node server.js in terminal 2
 
 
 
