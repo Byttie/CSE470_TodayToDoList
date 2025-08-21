@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './homepage.css';
 
 const Homepage = () => {
@@ -7,12 +7,22 @@ const Homepage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const storedUsername = localStorage.getItem('username');
+    if (isLoggedIn === 'true' && storedUsername) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     
     // Simple validation - in a real app, this would connect to a backend
-    if (username.trim() === '' || password.trim() === '') {
+    if (username.trim() === '' || password.trim() === '') { 
       setError('Please enter both username and password');
       return;
     }
@@ -31,15 +41,18 @@ const Homepage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password }), 
       });
       
       const data = await response.json();
       
       if (response.ok) {
         setPassword(''); // Clear password for security
-        alert('Login successful! Welcome back!');
-        setUsername(''); // Clear username as well
+        // Store authentication data in localStorage
+        localStorage.setItem('username', username);
+        localStorage.setItem('isLoggedIn', 'true');
+        // Redirect to dashboard
+        navigate('/dashboard');
       } else {
         setError(data.error || 'Login failed. Please check your credentials.');
       }
@@ -86,7 +99,7 @@ const Homepage = () => {
               />
             </div>
             
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="error-message">{error}</div>} 
             
             <button type="submit" className="login-btn" disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Login'}
