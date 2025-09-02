@@ -1,3 +1,4 @@
+import Clock from './Clock';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './dashboard.css';
@@ -39,7 +40,7 @@ const Dashboard = () => {
         <main className="dash-main">
           <div className="center-hero">
             <h1 className="app-title">TodayToDoList</h1>
-            <div className="clock-placeholder">Clock goes here</div>
+            <Clock />
           </div>
 
           <nav className="dash-nav">

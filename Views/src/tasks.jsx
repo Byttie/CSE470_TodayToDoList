@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Clock from './Clock';
 import './dashboard.css';
 
 const Tasks = () => {
@@ -112,6 +113,7 @@ const Tasks = () => {
 
         <div className="dashboard-header">
           <h1>My Tasks</h1>
+          <Clock />
           <div className="user-info" style={{ justifyContent: 'flex-end' }}>
             <button onClick={handleBack} className="logout-btn">Back to Dashboard</button>
           </div>
