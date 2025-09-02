@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Clock from './Clock';
 import AddTaskModal from './AddTaskModal';
+import SmallTimer from './SmallTimer';
 import './dashboard.css';
 
 const Tasks = () => {
@@ -25,7 +26,8 @@ const Tasks = () => {
     const diffMs = tomorrow.getTime() - now.getTime();
     const diffHours = diffMs / (1000 * 60 * 60);
     
-    return Math.max(0, Math.round(diffHours * 10) / 10); // Round to 1 decimal place
+    // Round to 2 decimal places for more precision, then round to nearest minute
+    return Math.max(0, Math.round(diffHours * 100) / 100);
   };
 
   // Calculate total time used by existing tasks
@@ -43,6 +45,12 @@ const Tasks = () => {
     return Math.max(0, timeUntilNextDay - totalTimeUsed);
   };
 
+  // Handle timer completion
+  const handleTimerComplete = (taskName) => {
+    alert(`Timer completed for task: ${taskName}! 🎉`);
+    // You can add additional logic here like marking task as completed
+  };
+
   // Format decimal hours to hours and minutes
   const formatTime = (decimalHours) => {
     if (decimalHours === 0) return "0h 0m";
@@ -50,12 +58,16 @@ const Tasks = () => {
     const hours = Math.floor(decimalHours);
     const minutes = Math.round((decimalHours - hours) * 60);
     
-    if (minutes === 0) {
-      return `${hours}h`;
-    } else if (hours === 0) {
-      return `${minutes}m`;
+    // Handle edge case where rounding minutes gives 60
+    const finalHours = minutes === 60 ? hours + 1 : hours;
+    const finalMinutes = minutes === 60 ? 0 : minutes;
+    
+    if (finalMinutes === 0) {
+      return `${finalHours}h`;
+    } else if (finalHours === 0) {
+      return `${finalMinutes}m`;
     } else {
-      return `${hours}h ${minutes}m`;
+      return `${finalHours}h ${finalMinutes}m`;
     }
   };
 
@@ -64,13 +76,13 @@ const Tasks = () => {
     if (storedUsername) setUsername(storedUsername);
     fetchTasks();
     
-    // Update remaining hours every minute
+    // Update remaining hours every second to sync with clock
     const updateRemainingHours = () => {
       setRemainingHours(calculateRemainingHours());
     };
     
     updateRemainingHours();
-    const interval = setInterval(updateRemainingHours, 60000); // Update every minute
+    const interval = setInterval(updateRemainingHours, 1000); // Update every second
     
     return () => clearInterval(interval);
   }, []);
@@ -240,6 +252,14 @@ const Tasks = () => {
                         )}
                         <div className="task-meta">
                           {t.time && <span className="task-time">{formatTime(parseFloat(t.time))}</span>}
+                          {t.time && (
+                            <SmallTimer
+                              taskId={t.taskid}
+                              taskTime={parseFloat(t.time) || 0}
+                              taskName={t.name || t.task}
+                              onTimerComplete={handleTimerComplete}
+                            />
+                          )}
                         </div>
                       </div>
                       <button

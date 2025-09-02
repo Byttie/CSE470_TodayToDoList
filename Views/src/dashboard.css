@@ -437,4 +437,12 @@
 
 .task-date {
   color: #6b7280;
+}
+
+/* Task Meta Styling - Updated for small timer */
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
 } 
