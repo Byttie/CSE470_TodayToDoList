@@ -323,4 +323,118 @@
   .user-name { display: none; }
   .user-avatar { width: 32px; height: 32px; }
   .logout-btn { padding: 8px 14px; font-size: 0.9rem; }
+}
+
+/* Enhanced Task Features */
+.time-remaining {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.time-remaining p {
+  margin: 4px 0;
+  color: #0369a1;
+  font-size: 0.9rem;
+}
+
+.time-remaining p:first-child {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.time-remaining p:last-child {
+  color: #059669;
+  font-weight: 600;
+}
+
+.no-time-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.no-time-message p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Enhanced Task Item Styles */
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.task-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-content {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.task-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin: 0;
+}
+
+.task-priority {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.task-description {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.task-time {
+  background: #ddd6fe;
+  color: #7c3aed;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.task-date {
+  color: #6b7280;
 } 

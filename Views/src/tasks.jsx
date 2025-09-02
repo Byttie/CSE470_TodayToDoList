@@ -1,22 +1,78 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Clock from './Clock';
+import AddTaskModal from './AddTaskModal';
 import './dashboard.css';
 
 const Tasks = () => {
   const [username, setUsername] = useState('');
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState('');
   const [adding, setAdding] = useState(false);
   const [deletingTaskId, setDeletingTaskId] = useState(null);
   const [error, setError] = useState('');
   const [loadingTasks, setLoadingTasks] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [remainingHours, setRemainingHours] = useState(24);
   const navigate = useNavigate();
+
+  // Calculate remaining hours until next day
+  const calculateRemainingHours = () => {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const diffMs = tomorrow.getTime() - now.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+    
+    return Math.max(0, Math.round(diffHours * 10) / 10); // Round to 1 decimal place
+  };
+
+  // Calculate total time used by existing tasks
+  const calculateTotalTimeUsed = () => {
+    return tasks.reduce((total, task) => {
+      const taskTime = parseFloat(task.time) || 0;
+      return total + taskTime;
+    }, 0);
+  };
+
+  // Calculate available time for new tasks
+  const calculateAvailableTime = () => {
+    const totalTimeUsed = calculateTotalTimeUsed();
+    const timeUntilNextDay = calculateRemainingHours();
+    return Math.max(0, timeUntilNextDay - totalTimeUsed);
+  };
+
+  // Format decimal hours to hours and minutes
+  const formatTime = (decimalHours) => {
+    if (decimalHours === 0) return "0h 0m";
+    
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+    
+    if (minutes === 0) {
+      return `${hours}h`;
+    } else if (hours === 0) {
+      return `${minutes}m`;
+    } else {
+      return `${hours}h ${minutes}m`;
+    }
+  };
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
     if (storedUsername) setUsername(storedUsername);
     fetchTasks();
+    
+    // Update remaining hours every minute
+    const updateRemainingHours = () => {
+      setRemainingHours(calculateRemainingHours());
+    };
+    
+    updateRemainingHours();
+    const interval = setInterval(updateRemainingHours, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchTasks = async () => {
@@ -35,16 +91,13 @@ const Tasks = () => {
     }
   };
 
-  const handleAddTask = async () => {
+  const handleAddTask = async (taskData) => {
     const userId = localStorage.getItem('userId');
     if (!userId) {
       setError('User not identified. Please log in again.');
       return;
     }
-    if (!newTask.trim()) {
-      setError('Please enter a task name.');
-      return;
-    }
+    
     setError('');
     setAdding(true);
     try {
@@ -52,14 +105,22 @@ const Tasks = () => {
       const response = await fetch('http://localhost:3000/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: Number(userId), taskId, task: newTask.trim() })
+        body: JSON.stringify({ 
+          userId: Number(userId), 
+          taskId, 
+          name: taskData.name,
+          description: taskData.description,
+          priority: taskData.priority,
+          time: taskData.time
+        })
       });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || 'Failed to add task');
       }
-      setNewTask('');
+      setIsModalOpen(false);
       fetchTasks();
+      setRemainingHours(calculateRemainingHours());
     } catch (e) {
       setError(e.message);
     } finally {
@@ -96,6 +157,15 @@ const Tasks = () => {
     navigate('/dashboard');
   };
 
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return '#dc2626';
+      case 'medium': return '#d97706';
+      case 'low': return '#16a34a';
+      default: return '#6b7280';
+    }
+  };
+
   return (
     <div className="dashboard">
       <div className="dashboard-container">
@@ -118,23 +188,30 @@ const Tasks = () => {
             <button onClick={handleBack} className="logout-btn">Back to Dashboard</button>
           </div>
         </div>
+        
         <div className="dashboard-content">
           <div className="welcome-message">
             <div className="task-add-section">
               <h3 className="task-title">Add a task</h3>
+              <div className="time-remaining">
+                <p>Time remaining until next day: <strong>{formatTime(remainingHours)}</strong></p>
+                <p>Time used by existing tasks: <strong>{formatTime(calculateTotalTimeUsed())}</strong></p>
+                <p>Available time for new tasks: <strong>{formatTime(calculateAvailableTime())}</strong></p>
+              </div>
               <div className="task-row">
-                <input
-                  className="task-input"
-                  type="text"
-                  placeholder="Enter task name"
-                  value={newTask}
-                  onChange={(e) => setNewTask(e.target.value)}
-                  disabled={adding}
-                />
-                <button className="task-button" onClick={handleAddTask} disabled={adding}>
-                  {adding ? 'Adding...' : 'Add Task'}
+                <button 
+                  className="task-button" 
+                  onClick={() => setIsModalOpen(true)}
+                  disabled={adding || calculateAvailableTime() <= 0}
+                >
+                  {adding ? 'Adding...' : 'Add New Task'}
                 </button>
               </div>
+              {calculateAvailableTime() <= 0 && (
+                <div className="no-time-message">
+                  <p>No time remaining for new tasks. Delete existing tasks or wait for the next day!</p>
+                </div>
+              )}
               {error && <div className="task-error">{error}</div>}
             </div>
 
@@ -148,7 +225,28 @@ const Tasks = () => {
                 <ul>
                   {tasks.map((t) => (
                     <li key={t.taskid} className="task-item">
-                      <span className="task-name">{t.task}</span>
+                      <div className="task-content">
+                        <div className="task-header">
+                          <span className="task-name">{t.name || t.task}</span>
+                          <span 
+                            className="task-priority"
+                            style={{ color: getPriorityColor(t.priority) }}
+                          >
+                            {t.priority || 'medium'}
+                          </span>
+                        </div>
+                        {t.description && (
+                          <div className="task-description">{t.description}</div>
+                        )}
+                        <div className="task-meta">
+                          {t.time && <span className="task-time">{formatTime(parseFloat(t.time))}</span>}
+                          {t.created_at && (
+                            <span className="task-date">
+                              {new Date(t.created_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                       <button
                         className="task-delete"
                         onClick={() => handleDeleteTask(t.taskid)}
@@ -164,8 +262,15 @@ const Tasks = () => {
           </div>
         </div>
       </div>
+      
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddTask={handleAddTask}
+        remainingHours={calculateAvailableTime()}
+      />
     </div>
   );
 };
 
-export default Tasks; 
+export default Tasks;
