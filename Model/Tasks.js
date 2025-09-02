@@ -1,12 +1,12 @@
 const client = require('./database');
 
 function addTask(userId, taskId, taskName, description, priority, time) {
-    const query = 'INSERT INTO tasks (id, taskid, task, "desc", priority, time, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())';
+    const query = 'INSERT INTO tasks (id, taskid, task, "desc", priority, time) VALUES ($1, $2, $3, $4, $5, $6)';
     return client.query(query, [userId, taskId, taskName, description, priority, time]);
 }
 
 function listTasks(userId) {
-    const query = 'SELECT id, taskid, task, "desc" as description, priority, time, created_at FROM tasks WHERE id = $1 ORDER BY taskid DESC';
+    const query = 'SELECT id, taskid, task, "desc" as description, priority, time FROM tasks WHERE id = $1 ORDER BY taskid DESC';
     return client.query(query, [userId]);
 }
 

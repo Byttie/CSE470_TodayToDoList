@@ -240,11 +240,6 @@ const Tasks = () => {
                         )}
                         <div className="task-meta">
                           {t.time && <span className="task-time">{formatTime(parseFloat(t.time))}</span>}
-                          {t.created_at && (
-                            <span className="task-date">
-                              {new Date(t.created_at).toLocaleDateString()}
-                            </span>
-                          )}
                         </div>
                       </div>
                       <button
