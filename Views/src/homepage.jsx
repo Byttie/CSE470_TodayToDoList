@@ -51,6 +51,10 @@ const Homepage = () => {
         // Store authentication data in localStorage
         localStorage.setItem('username', username);
         localStorage.setItem('isLoggedIn', 'true');
+        if (data && data.user && (data.user.id || data.user.user_id)) {
+          const userId = data.user.id || data.user.user_id;
+          localStorage.setItem('userId', String(userId));
+        }
         // Redirect to dashboard
         navigate('/dashboard');
       } else {

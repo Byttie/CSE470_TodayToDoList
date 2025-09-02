@@ -93,6 +93,122 @@
   color: #666;
 }
 
+/* Add Task minimal styles */
+.task-add-section {
+  margin-top: 24px;
+  text-align: left;
+}
+
+.task-title {
+  margin: 0 0 10px 0;
+  color: #444;
+}
+
+.task-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-input {
+  flex: 1;
+  max-width: 420px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.task-button {
+  background: #667eea;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.task-button:hover {
+  background: #5967d6;
+  box-shadow: 0 6px 14px rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+}
+
+.task-button:disabled {
+  background: #aab2f5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.task-error {
+  margin-top: 8px;
+  color: #e53e3e;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* Task list styles */
+.task-list {
+  margin-top: 24px;
+  text-align: left;
+}
+
+.task-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: #fafafa;
+}
+
+.task-name {
+  color: #333;
+}
+
+.task-delete {
+  background: #f56565;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.task-delete:hover {
+  background: #e53e3e;
+  box-shadow: 0 6px 14px rgba(229, 62, 62, 0.25);
+  transform: translateY(-1px);
+}
+
+.task-delete:disabled {
+  background: #f8a5a5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .dashboard {
