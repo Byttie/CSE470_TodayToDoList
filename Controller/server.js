@@ -5,6 +5,9 @@ const cors = require('cors');
 const client = require('../Model/database');
 const userSignup = require('../Model/UserSignup');
 const userLogin = require('../Model/UserLogin');
+const addTaskController = require('./addTaskController');
+const listTasksController = require('./listTasksController');
+const deleteTaskController = require('./deleteTaskController');
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -46,6 +49,11 @@ app.post('/login', (req, res) => {
             res.status(500).json({ error: 'Database error' });
         });
 });
+
+// Mount task controllers
+app.use('/', addTaskController);
+app.use('/', listTasksController);
+app.use('/', deleteTaskController);
 
 // Serve static files from the Views/dist directory (built React app)
 app.use(express.static('../Views/dist'));
