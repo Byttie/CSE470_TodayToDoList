@@ -12,35 +12,44 @@
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
   overflow: hidden;
 }
 
-.dashboard-header {
+/* New top bar layout */
+.dash-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 30px;
-  text-align: center;
+  padding: 16px 24px;
 }
 
-.dashboard-header h1 {
-  margin: 0 0 20px 0;
-  font-size: 2.5rem;
+.dash-left, .dash-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
 }
 
-.user-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-}
-
-.username {
-  font-size: 1.2rem;
+.user-name {
   font-weight: 600;
 }
 
@@ -48,9 +57,9 @@
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 12px 24px;
+  padding: 10px 18px;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -64,8 +73,94 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Main area */
+.dash-main {
+  padding: 28px;
+}
+
+.center-hero {
+  text-align: center;
+  padding: 20px 0 8px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 2.2rem;
+  color: #333;
+}
+
+.clock-placeholder {
+  margin-top: 8px;
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Navigation cards */
+.dash-nav {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.nav-card {
+  display: block;
+  text-decoration: none;
+  background: #f7f7ff;
+  border: 1px solid #ececff;
+  border-radius: 14px;
+  padding: 16px;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+  color: #2d2d2d;
+}
+
+.nav-card:hover {
+  background: #eff0ff;
+  box-shadow: 0 8px 18px rgba(102, 126, 234, 0.25);
+  transform: translateY(-2px);
+}
+
+.nav-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.nav-desc {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* Preserve existing styles used by tasks page */
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 20px 0;
+  font-size: 2.0rem;
+  font-weight: 700;
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.username {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 .dashboard-content {
-  padding: 40px;
+  padding: 24px;
 }
 
 .welcome-message {
@@ -209,50 +304,27 @@
   transform: none;
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .dashboard {
     padding: 10px;
   }
-  
-  .dashboard-header {
-    padding: 20px;
+
+  .dash-topbar {
+    padding: 12px 16px;
   }
-  
-  .dashboard-header h1 {
-    font-size: 2rem;
+
+  .app-title {
+    font-size: 1.8rem;
   }
-  
-  .user-info {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-  
+
   .dashboard-content {
     padding: 20px;
-  }
-  
-  .welcome-message h2 {
-    font-size: 1.5rem;
-  }
-  
-  .welcome-message p {
-    font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .dashboard-header h1 {
-    font-size: 1.8rem;
-  }
-  
-  .username {
-    font-size: 1rem;
-  }
-  
-  .logout-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
+  .user-name { display: none; }
+  .user-avatar { width: 32px; height: 32px; }
+  .logout-btn { padding: 8px 14px; font-size: 0.9rem; }
 } 

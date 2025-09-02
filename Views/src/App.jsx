@@ -3,6 +3,9 @@ import Homepage from './homepage';
 import Signup from './signup';
 import Dashboard from './dashboard';
 import ProtectedRoute from './ProtectedRoute';
+import Tasks from './tasks';
+import Shop from './shop';
+import Social from './social';
 
 function App() {
   return (
@@ -13,6 +16,21 @@ function App() {
         <Route path="/dashboard" element={
           <ProtectedRoute> 
             <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/tasks" element={
+          <ProtectedRoute>
+            <Tasks />
+          </ProtectedRoute>
+        } />
+        <Route path="/shop" element={
+          <ProtectedRoute>
+            <Shop />
+          </ProtectedRoute>
+        } />
+        <Route path="/social" element={
+          <ProtectedRoute>
+            <Social />
           </ProtectedRoute>
         } />
       </Routes>
