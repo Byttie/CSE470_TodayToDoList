@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import './SmallTimer.css';
 
-const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete }) => {
+const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskCompleted, onTaskTimeout }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const intervalRef = useRef(null);
 
   // Convert task time (in hours) to seconds for countdown
@@ -24,10 +24,10 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete }) => {
         setTimeLeft(prev => {
           if (prev <= 1) {
             setIsRunning(false);
-            setIsPaused(false);
             setHasStarted(false);
-            if (onTimerComplete) {
-              onTimerComplete(taskName);
+            // Timer completed - this means task timeout
+            if (onTaskTimeout) {
+              onTaskTimeout(taskId, taskTime, taskName);
             }
             return 0;
           }
@@ -39,24 +39,20 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete }) => {
     }
 
     return () => clearInterval(intervalRef.current);
-  }, [isRunning, timeLeft, taskName, onTimerComplete]);
+  }, [isRunning, timeLeft, taskName, taskId, taskTime, onTaskTimeout]);
 
   const startTimer = () => {
     setIsRunning(true);
-    setIsPaused(false);
     setHasStarted(true);
   };
 
-  const pauseTimer = () => {
+  const handleTaskCompleted = () => {
+    if (onTaskCompleted) {
+      onTaskCompleted(taskId, taskTime, taskName);
+    }
+    setIsCompleted(true);
     setIsRunning(false);
-    setIsPaused(true);
-  };
-
-  const resetTimer = () => {
-    setIsRunning(false);
-    setIsPaused(false);
     setHasStarted(false);
-    initializeTimer();
   };
 
   const formatTime = (seconds) => {
@@ -72,10 +68,10 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete }) => {
   };
 
   const getStatus = () => {
+    if (isCompleted) return 'completed';
     if (!hasStarted) return 'ready';
     if (isRunning) return 'running';
-    if (isPaused) return 'paused';
-    if (timeLeft === 0) return 'completed';
+    if (timeLeft === 0) return 'timeout';
     return 'ready';
   };
 
@@ -88,7 +84,7 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete }) => {
       </div>
       
       <div className="timer-controls">
-        {!hasStarted && (
+        {!hasStarted && !isCompleted && (
           <button 
             className="timer-btn start-btn" 
             onClick={startTimer}
@@ -99,34 +95,26 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete }) => {
           </button>
         )}
         
-        {hasStarted && !isRunning && timeLeft > 0 && (
+        {hasStarted && !isCompleted && (
           <button 
-            className="timer-btn start-btn" 
-            onClick={startTimer}
-            title="Resume Timer"
+            className="timer-btn complete-btn" 
+            onClick={handleTaskCompleted}
+            title="Mark Task as Completed"
           >
-            ▶️
+            ✅
           </button>
         )}
         
-        {isRunning && (
-          <button 
-            className="timer-btn pause-btn" 
-            onClick={pauseTimer}
-            title="Pause Timer"
-          >
-            ⏸️
-          </button>
+        {isCompleted && (
+          <div className="completion-message">
+            <span className="success-text">Task Completed! 🎉</span>
+          </div>
         )}
         
-        {hasStarted && (
-          <button 
-            className="timer-btn reset-btn" 
-            onClick={resetTimer}
-            title="Reset Timer"
-          >
-            🔄
-          </button>
+        {status === 'timeout' && (
+          <div className="timeout-message">
+            <span className="timeout-text">Time's Up! ⏰</span>
+          </div>
         )}
       </div>
     </div>

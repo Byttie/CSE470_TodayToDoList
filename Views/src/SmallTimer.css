@@ -22,14 +22,16 @@
   animation: pulse-small 2s infinite;
 }
 
-.small-timer.paused {
-  background: #fef3c7;
-  border-color: #f59e0b;
-}
+
 
 .small-timer.completed {
   background: #d1fae5;
   border-color: #10b981;
+}
+
+.small-timer.timeout {
+  background: #fee2e2;
+  border-color: #ef4444;
 }
 
 @keyframes pulse-small {
@@ -56,12 +58,14 @@
   color: #166534;
 }
 
-.small-timer.paused .timer-time {
-  color: #92400e;
-}
+
 
 .small-timer.completed .timer-time {
   color: #065f46;
+}
+
+.small-timer.timeout .timer-time {
+  color: #991b1b;
 }
 
 .timer-controls {
@@ -102,12 +106,31 @@
   background: rgba(34, 197, 94, 0.2);
 }
 
-.pause-btn:hover {
-  background: rgba(245, 158, 11, 0.2);
-}
+
 
 .reset-btn:hover {
   background: rgba(239, 68, 68, 0.2);
+}
+
+.complete-btn:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.completion-message, .timeout-message {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.success-text {
+  color: #065f46;
+}
+
+.timeout-text {
+  color: #991b1b;
 }
 
 /* Responsive adjustments */

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Clock from './Clock';
 import AddTaskModal from './AddTaskModal';
 import SmallTimer from './SmallTimer';
+import PointsDisplay from './PointsDisplay';
 import './dashboard.css';
 
 const Tasks = () => {
@@ -14,6 +15,7 @@ const Tasks = () => {
   const [loadingTasks, setLoadingTasks] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [remainingHours, setRemainingHours] = useState(24);
+  const [pointsRefreshTrigger, setPointsRefreshTrigger] = useState(0);
   const navigate = useNavigate();
 
   // Calculate remaining hours until next day
@@ -45,10 +47,74 @@ const Tasks = () => {
     return Math.max(0, timeUntilNextDay - totalTimeUsed);
   };
 
-  // Handle timer completion
+  // Handle timer completion (timeout)
   const handleTimerComplete = (taskName) => {
     alert(`Timer completed for task: ${taskName}! 🎉`);
     // You can add additional logic here like marking task as completed
+  };
+
+  // Handle task completion (user pressed finish button)
+  const handleTaskCompleted = async (taskId, taskTime, taskName) => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setError('User not identified. Please log in again.');
+      return;
+    }
+
+    try {
+      const taskTimeInMinutes = Math.round(taskTime * 60); // Convert hours to minutes
+      const response = await fetch('http://localhost:3000/tasks/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: Number(userId),
+          taskId: Number(taskId),
+          taskTimeInMinutes: taskTimeInMinutes
+        })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to complete task');
+      }
+      
+      fetchTasks(); // Refresh the task list
+      setPointsRefreshTrigger(prev => prev + 1); // Refresh points display
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  // Handle task timeout (timer reached zero)
+  const handleTaskTimeout = async (taskId, taskTime, taskName) => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setError('User not identified. Please log in again.');
+      return;
+    }
+
+    try {
+      const taskTimeInMinutes = Math.round(taskTime * 60); // Convert hours to minutes
+      const response = await fetch('http://localhost:3000/tasks/timeout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: Number(userId),
+          taskId: Number(taskId),
+          taskTimeInMinutes: taskTimeInMinutes
+        })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to handle task timeout');
+      }
+      
+      fetchTasks(); // Refresh the task list
+      setPointsRefreshTrigger(prev => prev + 1); // Refresh points display
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
   // Format decimal hours to hours and minutes
@@ -201,6 +267,8 @@ const Tasks = () => {
           </div>
         </div>
         
+        <PointsDisplay refreshTrigger={pointsRefreshTrigger} />
+        
         <div className="dashboard-content">
           <div className="welcome-message">
             <div className="task-add-section">
@@ -258,6 +326,8 @@ const Tasks = () => {
                               taskTime={parseFloat(t.time) || 0}
                               taskName={t.name || t.task}
                               onTimerComplete={handleTimerComplete}
+                              onTaskCompleted={handleTaskCompleted}
+                              onTaskTimeout={handleTaskTimeout}
                             />
                           )}
                         </div>

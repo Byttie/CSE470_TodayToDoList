@@ -1,0 +1,90 @@
+.points-display {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.points-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.points-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.points-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.points-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.rank-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.rank-emoji {
+  font-size: 1.2rem;
+}
+
+.rank-text {
+  font-size: 1rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.points-loading, .points-error {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.9rem;
+}
+
+.points-error {
+  color: #fca5a5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .points-display {
+    margin: 12px 0;
+    padding: 12px;
+  }
+  
+  .points-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .points-value {
+    align-items: center;
+  }
+  
+  .points-number {
+    font-size: 1.5rem;
+  }
+  
+  .rank-info {
+    margin-top: 8px;
+  }
+}

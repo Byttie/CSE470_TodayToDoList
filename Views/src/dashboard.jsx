@@ -1,4 +1,5 @@
 import Clock from './Clock';
+import PointsDisplay from './PointsDisplay';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './dashboard.css';
@@ -42,6 +43,8 @@ const Dashboard = () => {
             <h1 className="app-title">TodayToDoList</h1>
             <Clock />
           </div>
+
+          <PointsDisplay />
 
           <nav className="dash-nav">
             <Link className="nav-card" to="/tasks">

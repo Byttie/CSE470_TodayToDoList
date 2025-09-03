@@ -8,6 +8,7 @@ const userLogin = require('../Model/UserLogin');
 const addTaskController = require('./addTaskController');
 const listTasksController = require('./listTasksController');
 const deleteTaskController = require('./deleteTaskController');
+const pointsController = require('./pointsController');
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -54,6 +55,7 @@ app.post('/login', (req, res) => {
 app.use('/', addTaskController);
 app.use('/', listTasksController);
 app.use('/', deleteTaskController);
+app.use('/', pointsController);
 
 // Serve static files from the Views/dist directory (built React app)
 app.use(express.static('../Views/dist'));
