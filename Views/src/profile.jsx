@@ -124,12 +124,6 @@ const Profile = () => {
     <div className="dashboard">
       <div className="dashboard-container">
         <header className="dash-topbar">
-          <div className="dash-left">
-            <div className="user-badge" title={username}>
-              <div className="user-avatar">{username ? username.charAt(0).toUpperCase() : '?'}</div>
-              <span className="user-name">{username}</span>
-            </div>
-          </div>
           <div className="dash-right">
             <button onClick={handleLogout} className="logout-btn">Logout</button>
           </div>

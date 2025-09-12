@@ -8,6 +8,7 @@ import './dashboard.css';
 
 const Tasks = () => {
   const [username, setUsername] = useState('');
+  const [profileImage, setProfileImage] = useState('');
   const [tasks, setTasks] = useState([]);
   const [adding, setAdding] = useState(false);
   const [deletingTaskId, setDeletingTaskId] = useState(null);
@@ -139,7 +140,9 @@ const Tasks = () => {
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
+    const storedUserId = localStorage.getItem('userId');
     if (storedUsername) setUsername(storedUsername);
+    if (storedUserId) fetchProfile(storedUserId);
     fetchTasks();
     
     // Update remaining hours every second to sync with clock
@@ -152,6 +155,18 @@ const Tasks = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  const fetchProfile = async (userId) => {
+    try {
+      const res = await fetch(`http://localhost:3000/profile/${userId}`);
+      const data = await res.json();
+      if (res.ok) {
+        setProfileImage(data.profileImage || '');
+      }
+    } catch (e) {
+      console.error('Failed to fetch profile:', e);
+    }
+  };
 
   const fetchTasks = async () => {
     const userId = localStorage.getItem('userId');
@@ -249,8 +264,17 @@ const Tasks = () => {
       <div className="dashboard-container">
         <header className="dash-topbar">
           <div className="dash-left">
-            <div className="user-badge" title={username}>
-              <div className="user-avatar">{username ? username.charAt(0).toUpperCase() : '?'}</div>
+            <div className="user-badge" title={username} onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+              {profileImage ? (
+                <img 
+                  src={profileImage} 
+                  alt="Profile" 
+                  className="user-avatar"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div className="user-avatar">{username ? username.charAt(0).toUpperCase() : '?'}</div>
+              )}
               <span className="user-name">{username}</span>
             </div>
           </div>

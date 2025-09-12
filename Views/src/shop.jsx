@@ -6,6 +6,7 @@ import './dashboard.css';
 
 const Shop = () => {
   const [username, setUsername] = useState('');
+  const [profileImage, setProfileImage] = useState('');
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -21,9 +22,23 @@ const Shop = () => {
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
+    const storedUserId = localStorage.getItem('userId');
     if (storedUsername) setUsername(storedUsername);
+    if (storedUserId) fetchProfile(storedUserId);
     fetchRewards();
   }, []);
+
+  const fetchProfile = async (userId) => {
+    try {
+      const res = await fetch(`http://localhost:3000/profile/${userId}`);
+      const data = await res.json();
+      if (res.ok) {
+        setProfileImage(data.profileImage || '');
+      }
+    } catch (e) {
+      console.error('Failed to fetch profile:', e);
+    }
+  };
 
   const hasPersist = (rewardId) => {
     try { return Boolean(localStorage.getItem(`reward_timer_${rewardId}`)); } catch (_) { return false; }
@@ -152,8 +167,17 @@ const Shop = () => {
       <div className="dashboard-container">
         <header className="dash-topbar">
           <div className="dash-left">
-            <div className="user-badge" title={username}>
-              <div className="user-avatar">{username ? username.charAt(0).toUpperCase() : '?'}</div>
+            <div className="user-badge" title={username} onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+              {profileImage ? (
+                <img 
+                  src={profileImage} 
+                  alt="Profile" 
+                  className="user-avatar"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div className="user-avatar">{username ? username.charAt(0).toUpperCase() : '?'}</div>
+              )}
               <span className="user-name">{username}</span>
             </div>
           </div>
