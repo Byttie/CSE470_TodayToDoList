@@ -12,6 +12,8 @@ const pointsController = require('./pointsController');
 const { uploadSingle } = require('./uploadService');
 const rewardsController = require('./rewardsController');
 const profileController = require('./profileController');
+const forumsController = require('./forumsController');
+const commentsController = require('./commentsController');
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -21,23 +23,19 @@ app.use(cors());
 // Use extracted upload service
 
 app.post('/signup', uploadSingle('profileImage'), (req, res) => {
-    console.log('Signup request received:', req.body);
     const { username, password } = req.body;
     if (!username || !password) {
-        console.log('Missing username or password');
         return res.status(400).json({ error: 'Username and password are required' });
     }
     const profileImageUrl = req.file && req.file.path ? req.file.path : null;
     userSignup.signupUser(username, password, profileImageUrl)
         .then(result => {
-            console.log('User successfully inserted:', result);
             res.status(200).json({ message: 'Data inserted successfully' });
         })
         .catch(err => {
             if (err && (err.code === 'USER_EXISTS' || /duplicate key/i.test(err.message))) {
                 return res.status(409).json({ error: 'User already exists' });
             }
-            console.error('Database error during signup:', err);
             res.status(500).json({ error: 'Failed to insert data: ' + err.message });
         });
 });
@@ -67,6 +65,8 @@ app.use('/', deleteTaskController);
 app.use('/', pointsController);
 app.use('/', rewardsController);
 app.use('/', profileController);
+app.use('/', forumsController);
+app.use('/', commentsController);
 
 // Serve static files from the Views/dist directory (built React app)
 app.use(express.static('../Views/dist'));

@@ -29,7 +29,6 @@ const Dashboard = () => {
         setProfileImage(data.profileImage || '');
       }
     } catch (e) {
-      console.error('Failed to fetch profile:', e);
     }
   };
 
@@ -83,7 +82,7 @@ const Dashboard = () => {
             </Link>
             <Link className="nav-card" to="/social">
               <div className="nav-title">Social</div>
-              <div className="nav-desc">Coming soon</div>
+              <div className="nav-desc">Create and join community forums</div>
             </Link>
           </nav>
 

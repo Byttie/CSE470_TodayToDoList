@@ -23,7 +23,6 @@ router.get('/profile/:userId', (req, res) => {
             });
         })
         .catch(err => {
-            console.error('Error getting user profile:', err);
             res.status(500).json({ error: 'Failed to get user profile: ' + err.message });
         });
 });
@@ -45,7 +44,6 @@ router.put('/profile/:userId/password', (req, res) => {
             res.status(200).json({ message: 'Password updated successfully' });
         })
         .catch(err => {
-            console.error('Error updating password:', err);
             res.status(500).json({ error: 'Failed to update password: ' + err.message });
         });
 });
@@ -71,7 +69,6 @@ router.put('/profile/:userId/image', uploadSingle('profileImage'), (req, res) =>
             });
         })
         .catch(err => {
-            console.error('Error updating profile image:', err);
             res.status(500).json({ error: 'Failed to update profile image: ' + err.message });
         });
 });

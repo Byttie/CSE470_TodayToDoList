@@ -14,7 +14,6 @@ router.get('/rewards', (req, res) => {
 			res.status(200).json({ rewards: result.rows || [] });
 		})
 		.catch(err => {
-			console.error('Error listing rewards:', err);
 			res.status(500).json({ error: 'Failed to list rewards: ' + err.message });
 		});
 });
@@ -45,7 +44,6 @@ router.post('/rewards', (req, res) => {
 			});
 		})
 		.catch(err => {
-			console.error('Error creating reward:', err);
 			if (/Insufficient points/i.test(err.message)) {
 				return res.status(400).json({ error: 'Insufficient points' });
 			}
@@ -68,7 +66,6 @@ router.delete('/rewards/:rewardId', (req, res) => {
 			res.status(200).json({ message: 'Reward deleted', points: userPoints.points, rank: userPoints.rank, refund });
 		})
 		.catch(err => {
-			console.error('Error deleting reward:', err);
 			res.status(500).json({ error: 'Failed to delete reward: ' + err.message });
 		});
 });

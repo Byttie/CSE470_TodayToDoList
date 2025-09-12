@@ -14,13 +14,18 @@ const Profile = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [userForums, setUserForums] = useState([]);
+  const [forumsLoading, setForumsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
     const storedUserId = localStorage.getItem('userId');
     if (storedUsername) setUsername(storedUsername);
-    if (storedUserId) fetchProfile(storedUserId);
+    if (storedUserId) {
+      fetchProfile(storedUserId);
+      fetchUserForums(storedUserId);
+    }
   }, []);
 
   const fetchProfile = async (userId) => {
@@ -68,6 +73,62 @@ const Profile = () => {
     } finally {
       setUpdating(false);
     }
+  };
+
+  const fetchUserForums = async (userId) => {
+    setForumsLoading(true);
+    try {
+      const res = await fetch(`http://localhost:3000/forums/user/${userId}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch forums');
+      setUserForums(data.forums);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setForumsLoading(false);
+    }
+  };
+
+  const handleDeleteForum = async (forumId) => {
+    if (!window.confirm('Are you sure you want to delete this forum?')) {
+      return;
+    }
+
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setError('User not identified. Please log in again.');
+      return;
+    }
+
+    setUpdating(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await fetch(`http://localhost:3000/forums/${forumId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete forum');
+      setSuccess('Forum deleted successfully!');
+      fetchUserForums(userId); // Refresh the forums list
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const handlePasswordChange = async (e) => {
@@ -211,6 +272,41 @@ const Profile = () => {
                   <div style={{ padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
                     <p><strong>Username:</strong> {username}</p>
                   </div>
+                </div>
+
+                <div className="task-add-section">
+                  <h3 className="task-title">My Forums</h3>
+                  {forumsLoading ? (
+                    <div className="loading">Loading your forums...</div>
+                  ) : userForums.length === 0 ? (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                      <p>You haven't created any forums yet.</p>
+                      <p>Visit the <strong>Social</strong> page to create your first forum!</p>
+                    </div>
+                  ) : (
+                    <div className="forums-list">
+                      {userForums.map((forum) => (
+                        <div key={forum.forumid} className="forum-item">
+                          <div className="forum-content">
+                            <h4 className="forum-title">{forum.title}</h4>
+                            <p className="forum-description">{forum.description}</p>
+                            <div className="forum-meta">
+                              <span className="forum-date">Created: {formatDate(forum.created_at)}</span>
+                            </div>
+                          </div>
+                          <div className="forum-actions">
+                            <button 
+                              className="delete-btn"
+                              onClick={() => handleDeleteForum(forum.forumid)}
+                              disabled={updating}
+                            >
+                              {updating ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {error && <div className="task-error" style={{ marginTop: 20 }}>{error}</div>}

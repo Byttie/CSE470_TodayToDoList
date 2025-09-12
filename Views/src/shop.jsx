@@ -36,7 +36,6 @@ const Shop = () => {
         setProfileImage(data.profileImage || '');
       }
     } catch (e) {
-      console.error('Failed to fetch profile:', e);
     }
   };
 

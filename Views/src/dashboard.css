@@ -445,4 +445,100 @@
   align-items: center;
   gap: 10px;
   margin-top: 8px;
+}
+
+/* My Forums Styles */
+.forums-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.forum-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.forum-item:hover {
+  background: #f1f3f4;
+  border-color: #dee2e6;
+}
+
+.forum-content {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.forum-title {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.forum-description {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.forum-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.forum-date {
+  font-weight: 500;
+}
+
+.forum-actions {
+  display: flex;
+  align-items: center;
+}
+
+.delete-btn {
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive design for My Forums */
+@media (max-width: 768px) {
+  .forum-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .forum-content {
+    margin-right: 0;
+  }
+  
+  .forum-actions {
+    align-self: flex-end;
+  }
 } 
