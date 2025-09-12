@@ -18,9 +18,21 @@ const Social = () => {
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
+    const storedSelectedForum = localStorage.getItem('selectedForum');
+    
     if (storedUserId) {
       setUserId(storedUserId);
       fetchForums();
+      
+      // Restore selected forum if it exists
+      if (storedSelectedForum) {
+        try {
+          const forum = JSON.parse(storedSelectedForum);
+          setSelectedForum(forum);
+        } catch (error) {
+          localStorage.removeItem('selectedForum');
+        }
+      }
     } else {
       navigate('/');
     }
@@ -145,10 +157,12 @@ const Social = () => {
 
   const handleViewForum = (forum) => {
     setSelectedForum(forum);
+    localStorage.setItem('selectedForum', JSON.stringify(forum));
   };
 
   const handleBackToForums = () => {
     setSelectedForum(null);
+    localStorage.removeItem('selectedForum');
   };
 
   return (

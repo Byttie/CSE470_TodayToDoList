@@ -70,4 +70,42 @@ router.get('/comments/:commentId', async (req, res) => {
     }
 });
 
+// Like a comment
+router.post('/comments/:commentId/like', async (req, res) => {
+    try {
+        const { commentId } = req.params;
+        const result = await commentsModel.likeComment(commentId);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+        
+        res.status(200).json({ 
+            message: 'Comment liked successfully', 
+            likes: result.rows[0].likes 
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to like comment' });
+    }
+});
+
+// Unlike a comment
+router.post('/comments/:commentId/unlike', async (req, res) => {
+    try {
+        const { commentId } = req.params;
+        const result = await commentsModel.unlikeComment(commentId);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+        
+        res.status(200).json({ 
+            message: 'Comment unliked successfully', 
+            likes: result.rows[0].likes 
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to unlike comment' });
+    }
+});
+
 module.exports = router;

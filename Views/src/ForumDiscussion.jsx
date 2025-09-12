@@ -8,12 +8,27 @@ const ForumDiscussion = ({ forum, onBack, userId }) => {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [likingComments, setLikingComments] = useState(new Set());
+  const [likedComments, setLikedComments] = useState(new Set());
 
   useEffect(() => {
     if (forum) {
       fetchComments();
+      loadLikedComments();
     }
   }, [forum]);
+
+  const loadLikedComments = () => {
+    const liked = localStorage.getItem('likedComments');
+    if (liked) {
+      try {
+        const likedArray = JSON.parse(liked);
+        setLikedComments(new Set(likedArray));
+      } catch (error) {
+        localStorage.removeItem('likedComments');
+      }
+    }
+  };
 
   const fetchComments = async () => {
     setCommentsLoading(true);
@@ -66,6 +81,71 @@ const ForumDiscussion = ({ forum, onBack, userId }) => {
       setError('Error adding comment');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLikeComment = async (commentId) => {
+    if (likingComments.has(commentId)) return; // Prevent multiple clicks
+    
+    setLikingComments(prev => new Set(prev).add(commentId));
+    
+    const isCurrentlyLiked = likedComments.has(commentId);
+    const endpoint = isCurrentlyLiked ? 'unlike' : 'like';
+    
+    try {
+      const response = await fetch(`http://localhost:3000/comments/${commentId}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        // Update liked comments in localStorage
+        const newLikedComments = new Set(likedComments);
+        if (isCurrentlyLiked) {
+          newLikedComments.delete(commentId);
+        } else {
+          newLikedComments.add(commentId);
+        }
+        setLikedComments(newLikedComments);
+        localStorage.setItem('likedComments', JSON.stringify([...newLikedComments]));
+        
+        // Update the comment's like count and reorder comments
+        setComments(prevComments => {
+          const updatedComments = prevComments.map(comment => 
+            comment.commentid === commentId 
+              ? { 
+                  ...comment, 
+                  likes: isCurrentlyLiked 
+                    ? Math.max((comment.likes || 0) - 1, 0)
+                    : (comment.likes || 0) + 1
+                }
+              : comment
+          );
+          
+          // Sort by likes (descending) then by created_at (ascending)
+          return updatedComments.sort((a, b) => {
+            const likesA = a.likes || 0;
+            const likesB = b.likes || 0;
+            if (likesA !== likesB) {
+              return likesB - likesA; // Higher likes first
+            }
+            return new Date(a.created_at || 0) - new Date(b.created_at || 0); // Older first if same likes
+          });
+        });
+      } else {
+        setError(data.error || `Failed to ${isCurrentlyLiked ? 'unlike' : 'like'} comment`);
+      }
+    } catch (err) {
+      setError(`Error ${isCurrentlyLiked ? 'unliking' : 'liking'} comment`);
+    } finally {
+      setLikingComments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(commentId);
+        return newSet;
+      });
     }
   };
 
@@ -169,6 +249,15 @@ const ForumDiscussion = ({ forum, onBack, userId }) => {
                 </div>
                 <div className="comment-content">
                   {comment.comment}
+                </div>
+                <div className="comment-actions">
+                  <button 
+                    className={`like-btn ${likedComments.has(comment.commentid) ? 'liked' : ''}`}
+                    onClick={() => handleLikeComment(comment.commentid)}
+                    disabled={likingComments.has(comment.commentid)}
+                  >
+                    ❤️ {comment.likes || 0}
+                  </button>
                 </div>
               </div>
             ))

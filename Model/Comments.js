@@ -8,11 +8,11 @@ function addComment(userId, forumId, comment) {
 
 function getCommentsByForumId(forumId) {
     const query = `
-        SELECT c.comment, c.commentid, c.created_at, u.username, u.img as profile_image_url 
+        SELECT c.comment, c.commentid, c.created_at, c.likes, u.username, u.img as profile_image_url 
         FROM comments c 
         LEFT JOIN users u ON c.id = u.id 
         WHERE c.forumid = $1 
-        ORDER BY c.created_at ASC
+        ORDER BY c.likes DESC, c.created_at ASC
     `;
     return client.query(query, [forumId]);
 }
@@ -32,9 +32,21 @@ function getCommentById(commentId) {
     return client.query(query, [commentId]);
 }
 
+function likeComment(commentId) {
+    const query = 'UPDATE comments SET likes = COALESCE(likes, 0) + 1 WHERE commentid = $1 RETURNING *';
+    return client.query(query, [commentId]);
+}
+
+function unlikeComment(commentId) {
+    const query = 'UPDATE comments SET likes = GREATEST(COALESCE(likes, 0) - 1, 0) WHERE commentid = $1 RETURNING *';
+    return client.query(query, [commentId]);
+}
+
 module.exports = { 
     addComment, 
     getCommentsByForumId, 
     deleteComment, 
-    getCommentById 
+    getCommentById,
+    likeComment,
+    unlikeComment
 };

@@ -285,3 +285,66 @@
     font-size: 0.8rem;
   }
 }
+
+/* Comment Actions Styles */
+.comment-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e9ecef;
+}
+
+.like-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.like-btn:hover:not(:disabled) {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.like-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.like-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.like-btn.liked {
+  background: #e8f5e8;
+  border-color: #4caf50;
+  color: #2e7d32;
+}
+
+.like-btn.liked:hover:not(:disabled) {
+  background: #c8e6c9;
+  border-color: #4caf50;
+}
+
+/* Responsive adjustments for comment actions */
+@media (max-width: 768px) {
+  .comment-actions {
+    gap: 8px;
+  }
+  
+  .like-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
