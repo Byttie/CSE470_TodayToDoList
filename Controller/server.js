@@ -11,6 +11,7 @@ const deleteTaskController = require('./deleteTaskController');
 const pointsController = require('./pointsController');
 const { uploadSingle } = require('./uploadService');
 const rewardsController = require('./rewardsController');
+const profileController = require('./profileController');
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -65,6 +66,7 @@ app.use('/', listTasksController);
 app.use('/', deleteTaskController);
 app.use('/', pointsController);
 app.use('/', rewardsController);
+app.use('/', profileController);
 
 // Serve static files from the Views/dist directory (built React app)
 app.use(express.static('../Views/dist'));

@@ -6,6 +6,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Tasks from './tasks';
 import Shop from './shop';
 import Social from './social';
+import Profile from './profile';
 
 function App() {
   return (
@@ -31,6 +32,11 @@ function App() {
         <Route path="/social" element={
           <ProtectedRoute>
             <Social />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         } />
       </Routes>
