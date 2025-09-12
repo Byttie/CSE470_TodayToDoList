@@ -15,3 +15,6 @@ UPDATE tasks SET created_at = NOW() WHERE created_at IS NULL;
 
 -- Verify the changes
 \d tasks;
+
+-- Ensure users has profile_image_url for Cloudinary
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image_url TEXT;

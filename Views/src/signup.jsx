@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './homepage.css';
 
 const Signup = () => {
@@ -7,6 +7,9 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -26,20 +29,27 @@ const Signup = () => {
     setError('');
     
     try {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('password', password);
+      if (profileImage) {
+        formData.append('profileImage', profileImage);
+      }
+
       const response = await fetch('http://localhost:3000/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+        body: formData,
       });
       
       const data = await response.json();
       
       if (response.ok) {
-        setPassword(''); // Clear password for security
-        alert('Signup successful! Your account has been created.');
-        setUsername(''); // Clear username as well
+        setPassword('');
+        setUsername('');
+        setProfileImage(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        alert('Signup successful! Please log in.');
+        navigate('/');
       } else {
         setError(data.error || 'Signup failed. Please try again.');
       }
@@ -82,6 +92,18 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="profileImage">Profile Picture (optional)</label>
+              <input
+                type="file"
+                id="profileImage"
+                accept="image/*"
+                onChange={(e) => setProfileImage(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                ref={fileInputRef}
                 disabled={isLoading}
               />
             </div>

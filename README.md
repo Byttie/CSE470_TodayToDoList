@@ -37,6 +37,26 @@ Instructions
 8. run node server.js in terminal 2
 
 
+Cloudinary Setup for Profile Pictures
+
+1. In the Controller directory, create a .env file with:
+
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+2. Install backend dependencies (already in package.json but ensure installed):
+
+cd Controller
+npm install
+
+3. Database migration (PostgreSQL): ensure users table has profile_image_url column. You can run the final statements in fix_schema.sql or execute:
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image_url TEXT;
+
+4. Start backend and frontend as above. The signup form now accepts an optional image file and uploads it to Cloudinary, storing the URL in users.profile_image_url.
+
+
 
 
 
