@@ -1,22 +1,76 @@
 import { useState, useEffect, useRef } from 'react';
 import './SmallTimer.css';
 
-const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskCompleted, onTaskTimeout }) => {
+const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskCompleted, onTaskTimeout, autoStart, onStart, showCompletedMessage = true, persistKey }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const intervalRef = useRef(null);
 
+  const totalSeconds = Math.round(taskTime * 3600);
+
   // Convert task time (in hours) to seconds for countdown
   const initializeTimer = () => {
-    const totalSeconds = Math.round(taskTime * 3600); // Convert hours to seconds
     setTimeLeft(totalSeconds);
+  };
+
+  const readPersist = () => {
+    if (!persistKey) return null;
+    try {
+      const raw = localStorage.getItem(persistKey);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const writePersist = (data) => {
+    if (!persistKey) return;
+    try {
+      localStorage.setItem(persistKey, JSON.stringify(data));
+    } catch (_) {}
+  };
+
+  const clearPersist = () => {
+    if (!persistKey) return;
+    try { localStorage.removeItem(persistKey); } catch (_) {}
   };
 
   useEffect(() => {
     initializeTimer();
-  }, [taskTime]);
+  }, [totalSeconds]);
+
+  // Restore from persistence on mount
+  useEffect(() => {
+    const saved = readPersist();
+    if (saved && typeof saved.startedAt === 'number' && typeof saved.durationSec === 'number') {
+      const now = Date.now();
+      const elapsed = Math.floor((now - saved.startedAt) / 1000);
+      const remaining = Math.max(0, saved.durationSec - elapsed);
+      setTimeLeft(remaining);
+      if (remaining > 0) {
+        setHasStarted(true);
+        setIsRunning(true);
+      } else {
+        // Timer already finished while away
+        clearPersist();
+        if (onTaskTimeout) {
+          onTaskTimeout(taskId, taskTime, taskName);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-start support (if used elsewhere)
+  useEffect(() => {
+    if (autoStart && !hasStarted && timeLeft > 0) {
+      startTimer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, timeLeft]);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -25,7 +79,7 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskComplet
           if (prev <= 1) {
             setIsRunning(false);
             setHasStarted(false);
-            // Timer completed - this means task timeout
+            clearPersist();
             if (onTaskTimeout) {
               onTaskTimeout(taskId, taskTime, taskName);
             }
@@ -44,6 +98,10 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskComplet
   const startTimer = () => {
     setIsRunning(true);
     setHasStarted(true);
+    writePersist({ startedAt: Date.now(), durationSec: totalSeconds });
+    if (onStart) {
+      onStart(taskId);
+    }
   };
 
   const handleTaskCompleted = () => {
@@ -53,6 +111,7 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskComplet
     setIsCompleted(true);
     setIsRunning(false);
     setHasStarted(false);
+    clearPersist();
   };
 
   const formatTime = (seconds) => {
@@ -105,7 +164,7 @@ const SmallTimer = ({ taskId, taskTime, taskName, onTimerComplete, onTaskComplet
           </button>
         )}
         
-        {isCompleted && (
+        {isCompleted && showCompletedMessage && (
           <div className="completion-message">
             <span className="success-text">Task Completed! 🎉</span>
           </div>

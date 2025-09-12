@@ -53,7 +53,7 @@ const Dashboard = () => {
             </Link>
             <Link className="nav-card" to="/shop">
               <div className="nav-title">Shop</div>
-              <div className="nav-desc">Coming soon</div>
+              <div className="nav-desc">Redeem points for timed rewards</div>
             </Link>
             <Link className="nav-card" to="/social">
               <div className="nav-title">Social</div>
