@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Clock from './Clock';
 import AddTaskModal from './AddTaskModal';
@@ -17,7 +17,25 @@ const Tasks = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [remainingHours, setRemainingHours] = useState(24);
   const [pointsRefreshTrigger, setPointsRefreshTrigger] = useState(0);
+  const startedTasksRef = useRef(new Set());
   const navigate = useNavigate();
+
+  // Helper functions for timer persistence
+  const hasPersist = (taskId) => {
+    try { return Boolean(localStorage.getItem(`task_timer_${taskId}`)); } catch (_) { return false; }
+  };
+
+  const syncStartedFromStorage = (list) => {
+    const next = new Set();
+    list.forEach((t) => {
+      if (hasPersist(t.taskid)) next.add(t.taskid);
+    });
+    startedTasksRef.current = next;
+  };
+
+  const handleTimerStart = (taskId) => {
+    startedTasksRef.current.add(taskId);
+  };
 
   // Calculate remaining hours until next day
   const calculateRemainingHours = () => {
@@ -175,7 +193,9 @@ const Tasks = () => {
       const res = await fetch(`http://localhost:3000/tasks?userId=${Number(userId)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to fetch tasks');
-      setTasks(Array.isArray(data.tasks) ? data.tasks : []);
+      const list = Array.isArray(data.tasks) ? data.tasks : [];
+      setTasks(list);
+      syncStartedFromStorage(list);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -231,6 +251,9 @@ const Tasks = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete task');
       setTasks((prev) => prev.filter((t) => t.taskid !== taskId));
+      // Clean up persistence data
+      try { localStorage.removeItem(`task_timer_${taskId}`); } catch (_) {}
+      startedTasksRef.current.delete(taskId);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -351,6 +374,8 @@ const Tasks = () => {
                               onTimerComplete={handleTimerComplete}
                               onTaskCompleted={handleTaskCompleted}
                               onTaskTimeout={handleTaskTimeout}
+                              onStart={handleTimerStart}
+                              persistKey={`task_timer_${t.taskid}`}
                             />
                           )}
                         </div>
